@@ -4,6 +4,8 @@ import (
 	"os"
 
 	"github.com/bbengfort/otterdb/pkg"
+	"github.com/bbengfort/otterdb/pkg/config"
+	"github.com/bbengfort/otterdb/pkg/otter"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v2"
 )
@@ -19,7 +21,7 @@ func main() {
 	app.Commands = []*cli.Command{
 		{
 			Name:     "serve",
-			Usage:    "serve the TRISA Envoy node server configured from the environment",
+			Usage:    "serve the otterdb services configured from the environment",
 			Action:   serve,
 			Category: "server",
 		},
@@ -33,18 +35,18 @@ func main() {
 //===========================================================================
 
 func serve(c *cli.Context) (err error) {
-	// var conf config.Config
-	// if conf, err = config.New(); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+	var conf config.Config
+	if conf, err = config.New(); err != nil {
+		return cli.Exit(err, 1)
+	}
 
-	// var trisa *node.Node
-	// if trisa, err = node.New(conf); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+	var db *otter.OtterDB
+	if db, err = otter.New(conf); err != nil {
+		return cli.Exit(err, 1)
+	}
 
-	// if err = trisa.Serve(); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+	if err = db.Serve(); err != nil {
+		return cli.Exit(err, 1)
+	}
 	return nil
 }
