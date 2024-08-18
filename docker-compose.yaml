@@ -1,0 +1,19 @@
+services:
+  otterdb:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        GIT_REVISION: ${GIT_REVISION}
+    image: bbengfort/otterdb
+    init: true
+    ports:
+      - 2202:2202
+      - 2204:2204
+      - 2208:2208
+    volumes:
+      - ./tmp/otterdb:/data
+    environment:
+      - OTTER_MAINTENANCE=false
+      - OTTER_LOG_LEVEL=debug
+      - OTTER_CONSOLE_LOG=true
