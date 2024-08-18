@@ -1,0 +1,27 @@
+# Development
+.git
+.gitignore
+.github
+.vscode
+LICENSE
+README.md
+
+# OS Droppings
+.DS_Store
+
+# Node stuff
+node_modules
+build
+
+# Docker stuff
+.dockerignore
+Dockerfile
+docker-compose.yaml
+
+# Local configuration
+.env
+.env.template
+.secret
+
+# Temporary files
+tmp
