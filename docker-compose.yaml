@@ -1,5 +1,5 @@
 services:
-  otterdb:
+  jade:
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -12,7 +12,45 @@ services:
       - 2204:2204
       - 2208:2208
     volumes:
-      - ./tmp/otterdb:/data
+      - ./opt/jade:/data
+    environment:
+      - OTTER_MAINTENANCE=false
+      - OTTER_LOG_LEVEL=debug
+      - OTTER_CONSOLE_LOG=true
+
+  kira:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        GIT_REVISION: ${GIT_REVISION}
+    image: bbengfort/otterdb
+    init: true
+    ports:
+      - 3202:3202
+      - 3204:3204
+      - 3208:3208
+    volumes:
+      - ./opt/kira:/data
+    environment:
+      - OTTER_MAINTENANCE=false
+      - OTTER_LOG_LEVEL=debug
+      - OTTER_CONSOLE_LOG=true
+
+  opal:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        GIT_REVISION: ${GIT_REVISION}
+    image: bbengfort/otterdb
+    init: true
+    ports:
+      - 4202:4202
+      - 4204:4204
+      - 4208:4208
+    volumes:
+      - ./opt/opal:/data
     environment:
       - OTTER_MAINTENANCE=false
       - OTTER_LOG_LEVEL=debug
