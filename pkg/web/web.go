@@ -71,7 +71,7 @@ func New(conf config.WebConfig) (srv *Server, err error) {
 func (s *Server) Serve(errc chan<- error) (err error) {
 	if !s.conf.Enabled {
 		log.Warn().Bool("enabled", s.conf.Enabled).Msg("otterdb web ui is disabled")
-		return
+		return nil
 	}
 
 	// Create a socket to listen on and infer the final URL.
@@ -92,6 +92,7 @@ func (s *Server) Serve(errc chan<- error) (err error) {
 		}
 	}()
 
+	log.Info().Str("url", s.URL()).Msg("otterdb user interface started")
 	return nil
 }
 
