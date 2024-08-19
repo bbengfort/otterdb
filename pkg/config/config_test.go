@@ -11,9 +11,17 @@ import (
 )
 
 var testEnv = map[string]string{
-	"OTTER_MAINTENANCE": "true",
-	"OTTER_LOG_LEVEL":   "debug",
-	"OTTER_CONSOLE_LOG": "true",
+	"OTTER_MAINTENANCE":       "true",
+	"OTTER_LOG_LEVEL":         "debug",
+	"OTTER_CONSOLE_LOG":       "true",
+	"OTTER_SERVER_ENABLED":    "false",
+	"OTTER_SERVER_BIND_ADDR":  ":3303",
+	"OTTER_REPLICA_ENABLED":   "true",
+	"OTTER_REPLICA_BIND_ADDR": ":3304",
+	"OTTER_WEB_ENABLED":       "true",
+	"OTTER_WEB_MODE":          "test",
+	"OTTER_WEB_BIND_ADDR":     ":3305",
+	"OTTER_WEB_ORIGIN":        "https://example.com",
 }
 
 func TestConfig(t *testing.T) {
@@ -27,8 +35,19 @@ func TestConfig(t *testing.T) {
 
 	// Ensure configuration is correctly set from the environment
 	require.True(t, conf.Maintenance)
+	require.True(t, conf.Server.Maintenance)
+	require.True(t, conf.Replica.Maintenance)
+	require.True(t, conf.Web.Maintenance)
 	require.Equal(t, zerolog.DebugLevel, conf.GetLogLevel())
 	require.True(t, conf.ConsoleLog)
+	require.False(t, conf.Server.Enabled)
+	require.Equal(t, testEnv["OTTER_SERVER_BIND_ADDR"], conf.Server.BindAddr)
+	require.True(t, conf.Replica.Enabled)
+	require.Equal(t, testEnv["OTTER_REPLICA_BIND_ADDR"], conf.Replica.BindAddr)
+	require.True(t, conf.Web.Enabled)
+	require.Equal(t, testEnv["OTTER_WEB_MODE"], conf.Web.Mode)
+	require.Equal(t, testEnv["OTTER_WEB_BIND_ADDR"], conf.Web.BindAddr)
+	require.Equal(t, testEnv["OTTER_WEB_ORIGIN"], conf.Web.Origin)
 }
 
 // Returns the current environment for the specified keys, or if no keys are specified
