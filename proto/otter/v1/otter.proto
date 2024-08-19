@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package otter.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+service Otter {
+    // Implements a client-side heartbeat that can also be used by monitoring tools.
+    rpc Status(HealthCheck) returns (ServiceState) {}
+}
+
+// HealthCheck is used to query the service state of a replica.
+message HealthCheck {
+    // The number of failed health checks that proceeded the current check.
+    uint32 attempts = 1;
+
+    // The timestamp of the last health check, successful or otherwise.
+    google.protobuf.Timestamp last_checked_at = 2;
+}
+
+// ServiceState describes the health status of the replica for heartbeats and pings.
+message ServiceState {
+    enum Status {
+        UNKNOWN = 0;
+        HEALTHY = 1;
+        UNHEALTHY = 2;
+        DANGER = 3;
+        OFFLINE = 4;
+        MAINTENANCE = 5;
+    }
+
+    // Current service status as defined by the recieving system. The system is obliged
+    // to respond with the closest matching status in a best-effort fashion. Alerts will
+    // be triggered on service status changes if the system does not respond and the
+    // previous system state was not unknown.
+    Status status = 1;
+
+    // The current version of the replica
+    string version = 2;
+
+    // How long the replica has been up and running since it was last rebooted
+    google.protobuf.Duration uptime = 3;
+
+    // Hint to the client when to check the health status again.
+    google.protobuf.Timestamp not_before = 4;
+    google.protobuf.Timestamp not_after = 5;
+}
