@@ -7,8 +7,8 @@ if [[ ! -d $PROTOS ]]; then
     exit 1
 fi
 
-MODULE="github.com/bbengfort/otterdb/pkg/otter/api/v1"
-APIMOD="github.com/bbengfort/otterdb/pkg/otter/api/v1;api"
+MODULE="github.com/bbengfort/otterdb/pkg/server/api/v1"
+APIMOD="github.com/bbengfort/otterdb/pkg/server/api/v1;api"
 
 # Generate the protocol buffers
 protoc -I=${PROTOS} \

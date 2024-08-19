@@ -1,11 +1,18 @@
 services:
-  jade:
+  otterdb:
+    image: bbengfort/otterdb
+    command: ["echo", "build completed"]
     build:
       context: .
       dockerfile: ./Dockerfile
       args:
         GIT_REVISION: ${GIT_REVISION}
+
+  jade:
     image: bbengfort/otterdb
+    command: ["/usr/local/bin/otterdb", "serve"]
+    extends:
+      service: otterdb
     init: true
     ports:
       - 2202:2202
@@ -17,14 +24,21 @@ services:
       - OTTER_MAINTENANCE=false
       - OTTER_LOG_LEVEL=debug
       - OTTER_CONSOLE_LOG=true
+      - OTTER_SERVER_ENABLED=true
+      - OTTER_SERVER_BIND_ADDR=:2202
+      - OTTER_REPLICA_ENABLED=true
+      - OTTER_REPLICA_BIND_ADDR=:2204
+      - OTTER_WEB_ENABLED=true
+      - OTTER_WEB_MODE=release
+      - OTTER_WEB_BIND_ADDR=:2208
+      - OTTER_WEB_ORIGIN=http://localhost:2208
+
 
   kira:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-      args:
-        GIT_REVISION: ${GIT_REVISION}
     image: bbengfort/otterdb
+    command: ["/usr/local/bin/otterdb", "serve"]
+    extends:
+      service: otterdb
     init: true
     ports:
       - 3202:3202
@@ -36,14 +50,20 @@ services:
       - OTTER_MAINTENANCE=false
       - OTTER_LOG_LEVEL=debug
       - OTTER_CONSOLE_LOG=true
+      - OTTER_SERVER_ENABLED=true
+      - OTTER_SERVER_BIND_ADDR=:3202
+      - OTTER_REPLICA_ENABLED=true
+      - OTTER_REPLICA_BIND_ADDR=:3204
+      - OTTER_WEB_ENABLED=true
+      - OTTER_WEB_MODE=release
+      - OTTER_WEB_BIND_ADDR=:3208
+      - OTTER_WEB_ORIGIN=http://localhost:3208
 
   opal:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-      args:
-        GIT_REVISION: ${GIT_REVISION}
     image: bbengfort/otterdb
+    command: ["/usr/local/bin/otterdb", "serve"]
+    extends:
+      service: otterdb
     init: true
     ports:
       - 4202:4202
@@ -55,3 +75,25 @@ services:
       - OTTER_MAINTENANCE=false
       - OTTER_LOG_LEVEL=debug
       - OTTER_CONSOLE_LOG=true
+      - OTTER_SERVER_ENABLED=true
+      - OTTER_SERVER_BIND_ADDR=:4202
+      - OTTER_REPLICA_ENABLED=true
+      - OTTER_REPLICA_BIND_ADDR=:4204
+      - OTTER_WEB_ENABLED=true
+      - OTTER_WEB_MODE=release
+      - OTTER_WEB_BIND_ADDR=:4208
+      - OTTER_WEB_ORIGIN=http://localhost:4208
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+    - 8080:8080
+    volumes:
+    - ./opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+    - 3000:3000
+    volumes:
+    - ./opt/grafana:/var/lib/grafana

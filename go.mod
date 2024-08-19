@@ -3,8 +3,10 @@ module github.com/bbengfort/otterdb
 go 1.22.3
 
 require (
+	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
+	github.com/oklog/ulid/v2 v2.1.0
 	github.com/prometheus/client_golang v1.20.0
 	github.com/rotationalio/confire v1.0.0
 	github.com/rs/zerolog v1.33.0

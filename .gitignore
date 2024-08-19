@@ -27,3 +27,6 @@ go.work.sum
 
 # Temporary directory
 tmp
+
+# Docker compose configuration
+opt
