@@ -1,0 +1,9 @@
+# An example Prometheus configuration to scrape a single endpoint from docker-compose
+scrape_configs:
+  - job_name: 'otterdb'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+        - jade:2208
+        - kira:3208
+        - opal:4208
