@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package raft.v1;
+
+import "google/protobuf/timestamp.proto";
+
+service Raft {
+    rpc RequestVote (VoteRequest) returns (VoteReply) {}
+    rpc AppendEntries (stream AppendRequest) returns (stream AppendReply) {}
+}
+
+message VoteRequest {
+    uint64 term = 1;          // The epoch the candidate wants to be in
+    string candidate = 2;     // The identity of the candidate
+    uint64 lastLogIndex = 3;  // The last index in the candidate's log
+    uint64 lastLogTerm = 4;   // The last epoch in the candidate's log
+}
+
+message VoteReply {
+    string remote = 1;        // Identity of the follower
+    uint64 term = 2;          // Current epoch of the follower
+    bool granted = 3;         // At least one vote is granted
+}
+
+message AppendRequest {
+    uint64 term = 1;                // Epoch of the leader
+    string leader = 2;              // Identity of the leader
+    uint64 prevLogIndex = 3;        // Latest index in leader's log
+    uint64 prevLogTerm = 4;         // Epoch of the leader's prev log entry
+    uint64 leaderCommit = 5;        // The commit index of the leader for local commit
+    repeated LogEntry entries = 6;  // Entries to append to the remote's log
+}
+
+message AppendReply {
+    string remote = 1;              // Identity of the follower
+    uint64 term = 2;                // Epoch the follower is currently in
+    bool success = 3;               // If entries were appended or not
+    uint64 index = 4;               // Latest index in follower's log
+    uint64 commitIndex = 5;         // The commit index of follower
+}
+
+// Defines an entry in the log
+message LogEntry {
+    uint64 index = 1; // The expected position of the log entry
+    uint64 term  = 2; // The term of the log entry
+    string name  = 4; // The name of the command or object
+    bytes value  = 5; // The value of the object or command (nil for noop)
+}
+
+// Defines meta data for the log
+message LogMeta {
+    uint64 lastApplied = 1;                 // The index of the last applied entry
+    uint64 commitIndex = 2;                 // The index of the last committed entry
+    uint64 length = 3;                      // Number of entries in the log
+    google.protobuf.Timestamp created = 4;  // Timestamp the log was created
+    google.protobuf.Timestamp updated = 5;  // Timestamp the log was last updated
+}
+
+// A complete log (entries and meta) that is written to disk but cannot be
+// modified in place, e.g. has to be written in its entirety.
+message LogSnapshot {
+    LogMeta meta = 1;              // the meta data of the log
+    repeated LogEntry entries = 2; // the entries in the snapshot
+}
