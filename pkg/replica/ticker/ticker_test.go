@@ -65,7 +65,7 @@ func TestInterrupt(t *testing.T) {
 
 	// Create stopping routine
 	wg.Add(1)
-	time.AfterFunc(275*time.Millisecond, func() {
+	time.AfterFunc(255*time.Millisecond, func() {
 		beat.Stop()
 		wg.Done()
 	})
