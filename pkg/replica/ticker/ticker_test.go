@@ -11,7 +11,7 @@ import (
 
 func TestTicker(t *testing.T) {
 	var wg sync.WaitGroup
-	beat := ticker.New(ticker.Fixed(50 * time.Millisecond))
+	beat := ticker.New(ticker.Fixed(50*time.Millisecond), ticker.HeartbeatTimeout{})
 
 	// Create counter routine
 	wg.Add(1)
@@ -40,7 +40,7 @@ func TestTicker(t *testing.T) {
 
 func TestInterrupt(t *testing.T) {
 	var wg sync.WaitGroup
-	beat := ticker.New(ticker.Fixed(50 * time.Millisecond))
+	beat := ticker.New(ticker.Fixed(50*time.Millisecond), ticker.ElectionTimeout{})
 
 	// Create counter routine
 	wg.Add(1)

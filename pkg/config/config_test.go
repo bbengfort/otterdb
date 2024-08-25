@@ -18,6 +18,7 @@ var testEnv = map[string]string{
 	"OTTER_SERVER_BIND_ADDR":  ":3303",
 	"OTTER_REPLICA_ENABLED":   "true",
 	"OTTER_REPLICA_BIND_ADDR": ":3304",
+	"OTTER_REPLICA_AGGREGATE": "false",
 	"OTTER_WEB_ENABLED":       "true",
 	"OTTER_WEB_MODE":          "test",
 	"OTTER_WEB_BIND_ADDR":     ":3305",
@@ -44,6 +45,7 @@ func TestConfig(t *testing.T) {
 	require.Equal(t, testEnv["OTTER_SERVER_BIND_ADDR"], conf.Server.BindAddr)
 	require.True(t, conf.Replica.Enabled)
 	require.Equal(t, testEnv["OTTER_REPLICA_BIND_ADDR"], conf.Replica.BindAddr)
+	require.False(t, conf.Replica.Aggregate)
 	require.True(t, conf.Web.Enabled)
 	require.Equal(t, testEnv["OTTER_WEB_MODE"], conf.Web.Mode)
 	require.Equal(t, testEnv["OTTER_WEB_BIND_ADDR"], conf.Web.BindAddr)

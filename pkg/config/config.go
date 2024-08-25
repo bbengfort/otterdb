@@ -40,6 +40,7 @@ type ReplicaConfig struct {
 	Maintenance bool   `env:"OTTER_MAINTENANCE" desc:"if true sets the replica to maintenance mode; inherited from parent"`
 	Enabled     bool   `default:"false" desc:"if false, the replica service will not be started, e.g. run as a single node cluster"`
 	BindAddr    string `default:":2204" split_words:"true" desc:"the ip address and port to bind the replica server on"`
+	Aggregate   bool   `default:"true" desc:"if true the replica will aggregate append entries messages into a single consensus ballot"`
 }
 
 type WebConfig struct {

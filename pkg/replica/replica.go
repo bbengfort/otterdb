@@ -10,6 +10,7 @@ import (
 
 	"github.com/bbengfort/otterdb/pkg/config"
 	"github.com/bbengfort/otterdb/pkg/grpc/health/v1"
+	"github.com/bbengfort/otterdb/pkg/replica/events"
 	"github.com/bbengfort/otterdb/pkg/replica/raft/v1"
 
 	"github.com/rs/zerolog/log"
@@ -23,6 +24,8 @@ type Replica struct {
 	conf    config.ReplicaConfig
 	srv     *grpc.Server
 	started time.Time
+	events  chan events.Event
+	state   State
 }
 
 func New(conf config.ReplicaConfig) (r *Replica, err error) {
@@ -44,6 +47,7 @@ func New(conf config.ReplicaConfig) (r *Replica, err error) {
 	health.RegisterHealthServer(r.srv, r)
 
 	// Set the server to a not serving state
+	r.setState(Initialized)
 	r.NotHealthy()
 
 	return r, nil
@@ -54,6 +58,9 @@ func (r *Replica) Serve(errc chan<- error) (err error) {
 		log.Warn().Bool("enabled", r.conf.Enabled).Msg("otterdb replication is disabled")
 		return nil
 	}
+
+	// Create the events channel to run the event loop
+	r.events = make(chan events.Event, events.BufferSize)
 
 	// Listen for TCP requests (other sockets such as bufconn for tests should use Run)
 	var sock net.Listener
@@ -66,7 +73,11 @@ func (r *Replica) Serve(errc chan<- error) (err error) {
 
 	// Now that the server is running mark healthy and set the start time to track uptime
 	r.started = time.Now()
+	r.setState(Running)
 	r.Healthy()
+
+	// Run the event handling loop for "one big pipe synchronization"
+	go r.EventLoop(errc)
 
 	log.Info().Str("listen", r.conf.BindAddr).Msg("otterdb replica server started")
 	return nil
@@ -82,6 +93,19 @@ func (r *Replica) Run(errc chan<- error, sock net.Listener) {
 	}
 }
 
+// Run the one big pipe event loop to handle events
+func (r *Replica) EventLoop(errc chan<- error) {
+	if r.conf.Aggregate {
+		if err := events.AggregatingLoop(r.events, r); err != nil {
+			errc <- err
+		}
+	} else {
+		if err := events.Loop(r.events, r); err != nil {
+			errc <- err
+		}
+	}
+}
+
 func (r *Replica) Shutdown() (err error) {
 	// If the server is not enabled, skip shutdown
 	if !r.conf.Enabled {
@@ -92,6 +116,10 @@ func (r *Replica) Shutdown() (err error) {
 	log.Debug().Msg("gracefully shutting down otterdb replica server")
 	r.NotHealthy()
 
+	// Stop the gRPC server
 	r.srv.GracefulStop()
-	return nil
+
+	// Stop the event loop and set the state to stopped
+	close(r.events)
+	return r.setState(Stopped)
 }
