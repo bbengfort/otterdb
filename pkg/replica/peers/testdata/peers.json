@@ -1,0 +1,20 @@
+[
+  {
+    "pid": 20,
+    "name": "opal",
+    "addr": "opal.local:3264",
+    "region": "localhost"
+  },
+  {
+    "pid": 10,
+    "name": "kira",
+    "addr": "kira.local:3265",
+    "region": "localhost"
+  },
+  {
+    "pid": 30,
+    "name": "jade",
+    "addr": "jade.local:3266",
+    "region": "localhost"
+  }
+]
