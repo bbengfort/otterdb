@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 service Raft {
     rpc RequestVote (VoteRequest) returns (VoteReply) {}
-    rpc AppendEntries (stream AppendRequest) returns (stream AppendReply) {}
+    rpc AppendEntries (AppendRequest) returns (AppendReply) {}
 }
 
 message VoteRequest {
